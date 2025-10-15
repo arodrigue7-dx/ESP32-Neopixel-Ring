@@ -1,47 +1,43 @@
 #include <Adafruit_NeoPixel.h>
 
-// Which pin on the Arduino is connected to the NeoPixels?
-//#define LED_PIN    25   // ESP32
-#define LED_PIN   17    // D1 mini
+#define LED_PIN   17    // Pin del D1 mini conectado a los NeoPixels
+#define LED_COUNT 16    // Número de LEDs NeoPixel
 
-// How many NeoPixels are attached to the Arduino?
-#define LED_COUNT 16
-
-// Declare our NeoPixel strip object:
 Adafruit_NeoPixel strip(LED_COUNT, LED_PIN, NEO_GRB + NEO_KHZ800);
-// Argument 1 = Number of pixels in NeoPixel strip
-// Argument 2 = Arduino pin number (most are valid)
-// Argument 3 = Pixel type flags, add together as needed:
-//   NEO_KHZ800  800 KHz bitstream (most NeoPixel products w/WS2812 LEDs)
-//   NEO_KHZ400  400 KHz (classic 'v1' (not v2) FLORA pixels, WS2811 drivers)
-//   NEO_GRB     Pixels are wired for GRB bitstream (most NeoPixel products)
-//   NEO_RGB     Pixels are wired for RGB bitstream (v1 FLORA pixels, not v2)
-//   NEO_RGBW    Pixels are wired for RGBW bitstream (NeoPixel RGBW products)
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(115200);
-  Serial.println("Hello, ESP32!");
-  strip.begin();           // INITIALIZE NeoPixel strip object (REQUIRED)
-  strip.show();            // Turn OFF all pixels ASAP
-  strip.setBrightness(250); // Set BRIGHTNESS to about 1/5 (max = 255)
+  Serial.println("Hola, ESP32!");
+  strip.begin();           
+  strip.show();            
+  strip.setBrightness(250); 
  
-  // Fill along the length of the strip in various colors...
-  colorWipe(strip.Color(255,   0,   0), 20); // Red
-  colorWipe(strip.Color(  0, 255,   0), 15); // Green
-  colorWipe(strip.Color(  0,   0, 255), 00); // Blue
+  // Encender la tira con colores básicos
+  colorWipe(strip.Color(255, 0, 0), 20);  // Vermell
+  colorWipe(strip.Color(0, 255, 0), 15);  // Verd
+  colorWipe(strip.Color(0, 0, 255), 10);  // Blau
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
-  delay(10); // this speeds up the simulation
+  // Animació de cicle de color
+  for (int i = 0; i < 256; i++) {
+    rainbowCycle(i);
+    delay(10);
+  }
 }
 
-
 void colorWipe(uint32_t color, int wait) {
-  for (int i = 0; i < strip.numPixels(); i++) { // For each pixel in strip...
-    strip.setPixelColor(i, color);         //  Set pixel's color (in RAM)
-    strip.show();                          //  Update strip to match
-    delay(wait);                           //  Pause for a moment
+  for (int i = 0; i < strip.numPixels(); i++) {
+    strip.setPixelColor(i, color);
+    strip.show();
+    delay(wait);
   }
+}
+
+void rainbowCycle(uint8_t offset) {
+  for (int i = 0; i < strip.numPixels(); i++) {
+    uint8_t pixelHue = (i * 256 / strip.numPixels() + offset) & 255;
+    strip.setPixelColor(i, strip.ColorHSV(pixelHue * 256));
+  }
+  strip.show();
 }
